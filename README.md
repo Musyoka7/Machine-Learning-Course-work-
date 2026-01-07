@@ -1,102 +1,112 @@
-# Triple-MNIST Classification
+# Triple-MNIST Multi-Label Classification
 
-A machine learning project comparing different approaches for multi-label image classification on the Triple-MNIST dataset.
+A comprehensive machine learning project demonstrating **problem diagnosis**, **model development**, and **architectural innovation** to solve a deliberately challenging image classification task.
 
-## Problem Statement
+## 🎯 The Challenge
 
-The Triple-MNIST dataset extends the traditional MNIST dataset. Instead of single 28x28 digit images, it contains **84x84 grayscale images with 3 handwritten digits** per image. The goal is to predict the sequence of all three digits (e.g., "059", "348").
+The Triple-MNIST dataset contains **84×84 grayscale images with 3 handwritten digits** per image. The twist: **zero label overlap** exists between training, validation, and test sets.
 
-This transforms a simple 10-class problem into a much more complex multi-label classification challenge.
+| Split | Images | Unique Labels | Overlap with Training |
+|-------|--------|---------------|----------------------|
+| Train | 64,000 | 640 | — |
+| Validation | 16,000 | 160 | **0%** |
+| Test | 20,000 | 200 | **0%** |
 
-## Dataset
+This means a model trained to recognise "797" will never see that combination in validation or test. Traditional classification approaches **cannot work**.
 
-| Split | Images | Unique Labels |
-|-------|--------|---------------|
-| Train | 64,000 | 640 |
-| Validation | 16,000 | 160 |
-| Test | 20,000 | 200 |
+## 📊 Results Summary
 
-**Key Challenge:** There is zero label overlap between train, validation, and test sets. Models must learn to generalize to unseen digit combinations.
+| Approach | Test Accuracy | F1 Score | Key Insight |
+|----------|---------------|----------|-------------|
+| Logistic Regression | 0.00% | 0.00 | Cannot generalise to unseen combinations |
+| Baseline CNN | 0.00% | 0.00 | Same architectural limitation |
+| CNN + Dropout | 0.00% | 0.00 | Regularisation doesn't solve the core problem |
+| CNN + Augmentation | 0.00% | 0.00 | Augmentation corrupts 3-digit spatial structure |
+| **Digit-Splitting CNN** | **97.60%** | **0.9853** | ✅ Compositional generalisation |
+| Multi-Output CNN | 90.50% | 0.9412 | Multi-task learning approach |
+| GAN Augmentation | Failed | — | Mode collapse; documented as negative result |
 
-## Project Structure
+## 💡 Key Technical Achievements
+
+### 1. Problem Diagnosis
+- Identified that 0% validation accuracy from epoch 1 indicates an **architectural constraint**, not overfitting
+- Recognised this as a **compositional generalisation** problem requiring structural redesign
+
+### 2. Digit-Splitting Solution (97.60% accuracy)
+- Split 84×84 images into three 28×28 digit regions
+- Trained single-digit classifier (10 classes instead of 640)
+- Achieved **19,200 training samples per class** vs 100 for full-image approach
+- Model generalises to **any** 3-digit combination, including unseen ones
+
+### 3. Multi-Output Architecture (90.50% accuracy)
+- Single CNN with **3 parallel output heads**
+- Shared feature extraction with task-specific classification
+- Demonstrated multi-task learning principles (Caruana, 1997)
+
+### 4. GAN Experimentation
+- Implemented DCGAN for synthetic data generation
+- Documented training instability and mode collapse
+- Valuable negative result showing limits of brute-force augmentation
+
+## 🛠️ Technical Stack
+
+- **Deep Learning:** TensorFlow/Keras, CNN architectures, GANs
+- **Machine Learning:** Scikit-learn, Logistic Regression, hyperparameter tuning
+- **Data Science:** NumPy, Pandas, Matplotlib, Seaborn
+- **Evaluation:** Accuracy, F1 Score, Confusion Matrices, Training Curves
+- **Environment:** Python 3.13, Jupyter Notebooks
+
+## 📁 Repository Structure
 
 ```
-.
 ├── notebooks/
-│   └── Code.ipynb          # Main Jupyter notebook with all implementations
+│   └── Code.ipynb                    # Complete implementation (all 5 tasks)
 ├── data/
-│   └── triple_mnist/       # Dataset (train/val/test splits)
-├── ML-Assignment-2025.pdf  # Assignment specification
-├── requirements.txt        # Python dependencies
+│   └── triple_mnist/                 # Dataset (train/val/test splits)
+├── Machine Learning report - final.pdf  # Full written analysis
+├── ML-Assignment-2025.pdf            # Assignment specification
+├── requirements.txt                  # Python dependencies
 └── README.md
 ```
 
-## Tasks Overview
+## 🚀 Quick Start
 
-### Task 1: Data Exploration
-- Visualize random samples from the dataset
-- Analyze label distributions
-- Identify how this differs from typical classification (zero label overlap)
+```bash
+# Clone and setup
+git clone <repo-url>
+cd "Machine Learning Course work"
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
 
-### Task 2: Baseline Models
-- **Logistic Regression** on flattened images (7,056 features)
-- **Convolutional Neural Network (CNN)** on 2D images
-- Hyperparameter tuning using validation set
-- Evaluation with accuracy, F1 score, confusion matrix
+# Run notebook
+jupyter notebook notebooks/Code.ipynb
+```
 
-### Task 3: Model Improvement
-- Analyze training/validation loss curves for underfitting/overfitting
-- Implement improvement techniques:
-  - Increased model complexity
-  - Data augmentation
-  - Dropout layers
-  - Regularization methods
+## 📈 Skills Demonstrated
 
-### Task 4: Image Splitting Approach
-- Split each 84x84 image into three 28x28 digit images
-- Train CNN to predict single digits
-- Concatenate predictions for final three-digit output
+| Skill | Evidence |
+|-------|----------|
+| **Problem Analysis** | Diagnosed zero-overlap as architectural issue, not training issue |
+| **Model Development** | Logistic Regression, CNNs, Multi-output networks, GANs |
+| **Experiment Design** | Systematic comparison of 6+ approaches with controlled variables |
+| **Technical Writing** | Comprehensive report explaining methodology and results |
+| **Critical Thinking** | Recognised when to pivot approach vs optimise existing solution |
+| **Debugging ML Models** | Analysed training curves, identified mode collapse in GANs |
 
-### Task 5: Advanced Techniques
-- **(a)** Alternative CNN architecture for multi-label classification without splitting
-- **(b)** GAN-based data augmentation using DCGAN to generate synthetic training images
+## 📝 Key Learnings
 
-## Technologies Used
+1. **Architecture matters more than hyperparameters** when facing fundamental data constraints
+2. **Compositional generalisation** enables models to handle novel combinations of known components
+3. **Negative results are valuable** — the GAN failure informed the architectural solution
+4. **Understanding the problem** often leads to simpler, more effective solutions than brute-force approaches
 
-- Python 3.13
-- TensorFlow / Keras
-- scikit-learn
-- NumPy
-- Matplotlib / Seaborn
-- Jupyter Notebook
+## 👤 Author
 
-## Setup
+**Alex Musyoka**  
+University of Hull — Machine Learning Module (662086)
 
-1. Clone the repository
-2. Create a virtual environment:
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   ```
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Place the Triple-MNIST dataset in `data/triple_mnist/`
-5. Open and run `notebooks/Code.ipynb`
+## 🙏 Acknowledgements
 
-## Key Findings
-
-- **Baseline models achieve 0% validation accuracy** due to zero label overlap between splits
-- This is a **zero-shot learning problem** - models must generalize to unseen label combinations
-- The image-splitting approach (Task 4) enables generalization by predicting individual digits
-- CNNs outperform Logistic Regression due to their ability to learn spatial features
-
-## Author
-
-Alex Musyoka
-
-## Acknowledgments
-
-- University of Hull - Machine Learning Module (662086)
 - Prof. Adil Khan (Module Leader)
+- University of Hull, Department of Computer Science

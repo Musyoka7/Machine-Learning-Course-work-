@@ -65,3 +65,8 @@ models/*
 !models/.gitkeep
 reports/*
 !reports/.gitkeep
+
+# Assignment briefs (not needed for portfolio)
+ML-Assignment-2025.pdf
+further-clarification.md
+assigment_brief.md
